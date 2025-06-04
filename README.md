@@ -1,122 +1,99 @@
-# terraform-bastion-host-dataops
 # Implementing DataOps with Terraform: Building a Secure and Automated Data Environment on AWS
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+---
 
-This repository contains the Terraform configuration for deploying a bastion host architecture on AWS to securely access an RDS database within a private subnet. The project demonstrates DataOps principles and Infrastructure as Code (IaC) practices using Terraform. It serves as a practical example of how to automate infrastructure deployment, enforce security best practices like the principle of least privilege, and manage infrastructure state collaboratively.
+This repository contains the Terraform configuration I developed to deploy a bastion host architecture on AWS, ensuring secure access to an RDS database housed within a private subnet. This project was an opportunity for me to apply DataOps principles and Infrastructure as Code (IaC) best practices using Terraform, focusing on automation, security (Principle of Least Privilege), and collaborative infrastructure state management.
 
-## Architecture Diagram
+## My Role & Key Achievements:
 
-![Architecture Diagram](images/bastion_host.drawio.png)
+As the engineer for this project, I was responsible for the end-to-end design and implementation of the infrastructure using Terraform. My key achievements and the skills I applied include:
 
-This architecture features an RDS database instance hosted inside a private subnet of a given VPC, and an EC2 instance that acts as the bastion host. The EC2 instance resides in a public subnet within the same VPC so that it can receive external traffic from the public internet before relaying the secure traffic to the internal database.
+* **Infrastructure as Code (IaC) Expertise with Terraform:**
+    * Authored **modular Terraform configurations** to define and provision all AWS resources (VPC networking components, EC2 bastion host, RDS PostgreSQL instance, Security Groups).
+    * Developed a reusable **Terraform module (`bastion_host`)** encapsulating the bastion and RDS setup for better organization and maintainability.
+* **Secure Cloud Architecture Design:**
+    * Implemented a **bastion host (jump box) architecture** to provide secure, controlled SSH access to an RDS database instance located in a private subnet, thereby minimizing its direct exposure.
+    * Configured **AWS Security Groups** with granular ingress/egress rules to enforce the Principle of Least Privilege, allowing traffic only from necessary sources (e.g., bastion to RDS, public internet to bastion on specific ports).
+* **Robust Terraform State Management:**
+    * Configured a **Terraform S3 backend with DynamoDB for state locking**, enabling secure, centralized state file storage and preventing conflicts in collaborative or automated environments.
+* **Automation of Data Environments:**
+    * Demonstrated how Terraform can fully automate the creation, modification, and destruction of a common data access pattern, significantly reducing manual effort and potential for human error.
+* **DataOps Principles in Practice:**
+    * **Automation:** Leveraged IaC for repeatable and reliable environment provisioning.
+    * **Version Control:** Managed infrastructure configurations in Git, enabling tracking of changes and collaboration.
+    * **Collaboration:** Utilized a remote backend for shared state, a cornerstone for team-based IaC development.
+* **AWS Cloud Services Proficiency:**
+    * Gained hands-on experience with AWS EC2, RDS (PostgreSQL), VPC, Subnets (public/private), Security Groups, S3, and DynamoDB.
 
-## Project Structure
+## Architecture Deployed:
 
-The Terraform configuration files are organized as follows:
-├── modules/
-│   └── bastion_host/
-│       ├── ec2.tf          # Configuration for the EC2 bastion host instance
-│       ├── rds.tf          # Configuration for the RDS database instance
-│       ├── network.tf      # Networking resources (security groups, etc.)
-│       ├── variables.tf    # Input variables for the module
-│       ├── outputs.tf      # Output values from the module
-│       └── providers.tf    # Specifies required providers
-├── backend.tf            # Terraform backend configuration (S3 and DynamoDB)
-├── main.tf               # Main Terraform configuration, calls the bastion_host module
-├── outputs.tf            # Main output values (database endpoint, bastion host DNS, etc.)
-├── variables.tf          # Main input variables
-├── terraform.tfvars      # Example variable values (DO NOT COMMIT SECRETS!)
-└── README.md             # This file!
-*   **`modules/`:** Contains the `bastion_host` module, which encapsulates the configuration for the bastion host and RDS instance.
-*   **`backend.tf`:** Configures the Terraform backend to use AWS S3 for state storage and DynamoDB for state locking, ensuring secure and collaborative state management.
-*   **`main.tf`:** The main configuration file that calls the `bastion_host` module and sets up any necessary resources outside the module.
-*   **`outputs.tf`:** Defines the outputs of the Terraform configuration, such as the database endpoint and bastion host DNS.
-*   **`variables.tf`:** Declares input variables that allow customization of the deployment.
-*   **`terraform.tfvars`:** Provides example values for the input variables. **Do not commit your actual `terraform.tfvars` file to the repository if it contains sensitive information.**
+I designed and implemented the following architecture:
 
-## Prerequisites
+* An **AWS RDS PostgreSQL database instance** provisioned within a **private subnet** of a pre-existing VPC, ensuring it is not directly accessible from the public internet.
+* An **EC2 instance acting as a bastion host** (jump server) deployed in a **public subnet** within the same VPC. This host is configured to accept SSH connections from authorized IP addresses.
+* **Security Groups** meticulously configured to:
+    * Allow SSH traffic to the bastion host from the internet (ideally restricted to specific IPs).
+    * Allow database traffic (e.g., PostgreSQL port 5432) from the bastion host's security group to the RDS instance's security group.
+    * Deny all other unnecessary inbound/outbound traffic.
 
-Before you can deploy this infrastructure, you'll need the following:
+![Architecture Diagram](./images/your_architecture_diagram.png)
 
-*   An AWS account.
-*   Terraform installed on your local machine. You can download it from the official [Terraform website](https://www.terraform.io/downloads.html).
-*   AWS CLI installed and configured with appropriate credentials. Follow the instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-*   A VPC with at least two public subnets and two private subnets, each pair in a different availability zones.
+## Key Terraform Features Implemented:
 
-## Usage
+* **Modular Design:** The core infrastructure (bastion EC2, RDS, networking rules) is encapsulated within the `modules/bastion_host` directory.
+* **Parameterized Configuration:** Utilized `variables.tf` to define input variables (VPC ID, subnet IDs, region, database name, etc.), allowing for flexible deployments. Default and example values are managed via `terraform.tfvars` (kept out of version control for sensitive data).
+* **Exposed Outputs:** Defined `outputs.tf` to conveniently display critical information post-deployment, such as the RDS endpoint and the bastion host's public DNS/IP.
+* **Remote State Backend:** Implemented in `backend.tf` using AWS S3 for persistent state storage and DynamoDB for state locking, crucial for reliability and teamwork.
 
-1.  **Clone the repository:**
+## Technologies Used :
 
+* **Infrastructure as Code:** Terraform
+* **Cloud Platform:** Amazon Web Services (AWS)
+    * **Compute:** EC2 (for bastion host)
+    * **Database:** RDS for PostgreSQL
+    * **Networking:** VPC, Public/Private Subnets, Security Groups
+    * **Storage & State Management:** S3, DynamoDB
+* **Configuration Language:** HCL (HashiCorp Configuration Language)
+* **Operating System (Bastion - Example):** Amazon Linux 2 (or as configured)
+
+## Setup & Deployment:
+
+
+1.  **Prerequisites:**
+    * An AWS account with necessary permissions.
+    * Terraform installed locally.
+    * AWS CLI installed and configured.
+    * A pre-existing VPC with public and private subnets across different Availability Zones.
+2.  **Clone & Initialize:**
     ```bash
-    git clone <repository_url>
-    ```
-
-2.  **Navigate to the project directory:**
-
-    ```bash
-    cd <repository_name>
-    ```
-
-3.  **Initialize Terraform:**
-
-    ```bash
+    git clone <your-repository-url>
+    cd terraform-bastion-host-dataops 
     terraform init
     ```
-
-4.  **Create `terraform.tfvars`:**
-    Create a file named `terraform.tfvars` and add the necessary variable values, including your AWS region, VPC ID, subnet IDs, and desired database name. Here's an example:
-
-    ```terraform
-    # Rename this file to terraform.tfvars and update the values accordingly.
-    # Do NOT commit your actual terraform.tfvars file if it contains sensitive information.
-
-    region = "your-aws-region" # e.g., "us-east-1"
-    vpc_id = "vpc-xxxxxxxxxxxxxxxxx" # Replace with your VPC ID
-    public_subnet_ids = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-yyyyyyyyyyyyyyyyy"] # Replace with your Public Subnet IDs (at least two)
-    private_subnet_ids = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-yyyyyyyyyyyyyyyyy"] # Replace with your Private Subnet IDs (at least two)
-    database_name = "mydatabase"
-    database_username = "postgres_admin"
-    # database_password will be randomly generated by Terraform
-    availability_zone = "your-aws-az" # e.g., "us-east-1a"
-    ```
-    **IMPORTANT:** Do not commit your `terraform.tfvars` file with actual sensitive data to version control.
-
-5.  **Plan the deployment (optional but recommended):**
-
+3.  **Configure Variables:**
+    * Create a `terraform.tfvars` file (from the provided example structure).
+    * **Crucially, update it with your specific VPC, subnet IDs, region, etc.**
+    * **DO NOT commit `terraform.tfvars` if it contains sensitive information.** Add it to `.gitignore`.
+4.  **Plan & Apply:**
     ```bash
-    terraform plan
+    terraform plan  # Review the execution plan
+    terraform apply # Deploy the infrastructure (confirm with 'yes')
     ```
-    This command allows you to preview the changes that Terraform will make to your infrastructure.
-
-6.  **Deploy the infrastructure:**
-
+5.  **Accessing Outputs:** After a successful `apply`, Terraform will display defined outputs like the database endpoint and bastion host DNS.
+6.  **Destroy (When Done):**
     ```bash
-    terraform apply
+    terraform destroy # Tear down all deployed resources
     ```
-    Terraform will prompt you to confirm the deployment. Type `yes` and press Enter to proceed.
 
-7.  **Destroy the infrastructure (when finished):**
+## Value & Relevance to Data Engineering:
 
-    ```bash
-    terraform destroy
-    ```
-    This command will tear down all resources created by the Terraform configuration.
+This project is more than just deploying VMs and databases; it's about establishing the **secure and automated foundation** upon which data pipelines and analytical systems are built. As a Data Engineer, understanding how to:
 
-## Important Notes
+* Provision data infrastructure reliably and repeatedly.
+* Implement security best practices for data access.
+* Manage infrastructure changes through code and version control.
+* Collaborate effectively on infrastructure projects using shared state.
 
-*   This code is provided as an example and for educational purposes. It might require modifications to be suitable for production environments.
-*   Ensure you have configured your AWS credentials properly before running Terraform.
-*   Review the Terraform documentation for more information on the resources and configurations used in this project.
-*   The database password is automatically generated by Terraform for security reasons. You can find it in the Terraform outputs after deployment.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-*   Inspired by the principles of DataOps and Infrastructure as Code.
-*   Built with Terraform and AWS.
+...are critical skills. This project provided me with direct experience in these areas, aligning with modern DataOps methodologies.
 
 ---
