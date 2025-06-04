@@ -36,7 +36,7 @@ I designed and implemented the following architecture:
     * Allow database traffic (e.g., PostgreSQL port 5432) from the bastion host's security group to the RDS instance's security group.
     * Deny all other unnecessary inbound/outbound traffic.
 
-![Architecture Diagram](./images/your_architecture_diagram.png)
+![Architecture Diagram](./images/bastion_host.drawio.png)
 
 ## Key Terraform Features Implemented:
 
